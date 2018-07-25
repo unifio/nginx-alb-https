@@ -2,8 +2,9 @@ if ($proxy_x_forwarded_proto = "http") {
     set $httpsRedirect 1;
 }
 
-if ($request_uri ~* HEALTH_CHECK_URL){
+if ($request_uri ~* HEALTH_CHECK_PATH){
     set $httpsRedirect 0;
+    _SHOULD_RETURN_HEALTHY_
 }
 
 if ($httpsRedirect){
