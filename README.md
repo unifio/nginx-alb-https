@@ -5,7 +5,7 @@ Uses jwilder/nginx-proxy:
 https://github.com/jwilder/nginx-proxy
 
 ## AWS Health Check URL
-By default, any requests sent to `/api/v[0-9]+/health-?check$` will not be redirected to HTTPS. This is so AWS ALB health-checks can occur properly. This URL can be overridden by passing in the `HEALTH_CHECK_URL` when starting the image. Regex and non-regex locations can both be used.
+By default, any requests sent to `/api/v[0-9]+/health-?check$` will not be redirected to HTTPS. This is so AWS ALB health-checks can occur properly. This URL can be overridden by passing in the `HEALTH_CHECK_PATH` when starting the image. Regex and non-regex locations can both be used.
 
 This continer assumes that your ALB forwards 443 *and* 80 to a single port in your target group. You are not required to expose port 443. By not exposing port 443 directly from your web application, you are letting Nginx proxy all requests to your application.
 
@@ -13,7 +13,7 @@ This continer assumes that your ALB forwards 443 *and* 80 to a single port in yo
 Start the Nginx container:
 ```
 ❯ docker run --name nginx -d \
-    -e HEALTH_CHECK_URL=<URL that the ALB must access for health checks>
+    -e HEALTH_CHECK_PATH=<URL that the ALB must access for health checks>
     -p <port ALB forwards to>:80 \
     -v /var/run/docker.sock:/tmp/docker.sock:ro \
     nginx-alb-https
@@ -21,7 +21,7 @@ Start the Nginx container:
 
 Then start any other containers you wish to proxy:
 ```
-❯ docker run -d -e VIRTUAL_HOST=<Internal EC2 IP Address>,<Any other hostnames you wish to use> <docker image> 
+❯ docker run -d -e VIRTUAL_HOST=<Internal EC2 IP Address>,<Any other hostnames you wish to use> <docker image>
 ```
 Note that you `MUST` use the internal EC2 IP address as one of your hostnames. This is because AWS Health checks are done via internal IP address. If you do not put your instances internal IP, all of your health-checks will fail with 503 status codes.
 
